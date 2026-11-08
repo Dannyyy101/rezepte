@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 
 const KATEGORIEN = {
   kochen: { titel: "Kochen", beschreibung: "Herzhaftes für Herd und Pfanne." },
-  backen: { titel: "Backen", beschreibung: "Süßes und Herzhaftes aus dem Ofen." },
+  backen: { titel: "Backen", beschreibung: "Süßes aus dem Ofen." },
 } as const;
 
 export default async function KategorieSeite({
