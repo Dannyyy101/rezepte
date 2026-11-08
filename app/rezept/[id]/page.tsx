@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import SterneAnzeige from "@/components/sterne";
 import SterneBewertung from "@/components/sterne-bewertung";
 import { holeSession } from "@/lib/auth";
+import { bildUrl } from "@/lib/bild-url";
 import { pool, REZEPTE_MIT_BEWERTUNG, type RezeptMitBewertung } from "@/lib/db";
 import { bewerteRezept } from "./actions";
 
@@ -82,7 +83,7 @@ export default async function RezeptSeite({
         <div className="order-first md:order-0 md:sticky md:top-24 md:w-2/5 md:shrink-0 md:self-start">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={rezept.bild_pfad}
+            src={bildUrl(rezept.bild_pfad, "gross")}
             alt={rezept.titel}
             className="w-full rounded-3xl border border-stone-200 object-cover shadow-md"
           />

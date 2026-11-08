@@ -3,6 +3,7 @@ import { mkdir, unlink, writeFile } from "fs/promises";
 import path from "path";
 import convert from "heic-convert";
 import sharp from "sharp";
+import { BILD_GROESSEN } from "./bild-url";
 
 export const UPLOADS_ORDNER = path.join(process.cwd(), "public", "uploads");
 
@@ -59,6 +60,10 @@ export async function speichereBild(bild: File): Promise<string> {
 
 export async function loescheBild(bildPfad: string): Promise<void> {
   if (!bildPfad.startsWith("/uploads/")) return;
-  const datei = path.join(UPLOADS_ORDNER, path.basename(bildPfad));
-  await unlink(datei).catch(() => {});
+  const datei = path.basename(bildPfad);
+  await unlink(path.join(UPLOADS_ORDNER, datei)).catch(() => {});
+  // die verkleinerten Versionen (app/bild/[groesse]/[datei]/route.ts)
+  for (const groesse of Object.keys(BILD_GROESSEN)) {
+    await unlink(path.join(UPLOADS_ORDNER, ".cache", groesse, `${datei}.webp`)).catch(() => {});
+  }
 }

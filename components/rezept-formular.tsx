@@ -1,6 +1,7 @@
 "use client";
 
 import { startTransition, useActionState, useEffect, useState } from "react";
+import { bildUrl } from "@/lib/bild-url";
 import type { Rezept } from "@/lib/db";
 import type { FormularStatus } from "@/lib/rezept-formular";
 
@@ -177,7 +178,7 @@ export default function RezeptFormular({
           <div className="mb-3 flex items-center gap-4">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={vorschau ?? rezept!.bild_pfad!}
+              src={vorschau ?? bildUrl(rezept!.bild_pfad!, "klein")}
               alt={vorschau ? "Vorschau des neuen Bildes" : rezept!.titel}
               className="h-20 w-20 rounded-xl border border-stone-200 bg-stone-100 object-cover"
             />

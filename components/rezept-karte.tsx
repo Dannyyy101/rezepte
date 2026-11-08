@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { bildUrl } from "@/lib/bild-url";
 import type { RezeptMitBewertung } from "@/lib/db";
 import SterneAnzeige from "./sterne";
 
@@ -29,8 +30,10 @@ export default function RezeptKarte({ rezept }: { rezept: RezeptMitBewertung }) 
         {rezept.bild_pfad ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
-            src={rezept.bild_pfad}
+            src={bildUrl(rezept.bild_pfad, "klein")}
             alt={rezept.titel}
+            loading="lazy"
+            decoding="async"
             className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
           />
         ) : (
