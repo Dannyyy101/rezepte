@@ -1,11 +1,10 @@
 import IdeenSpalte from "@/components/ideen-spalte";
-import { pool, stelleIdeenTabelleSicher, type EssensIdee } from "@/lib/db";
+import { pool, type EssensIdee } from "@/lib/db";
 import { erstelleIdee, loescheIdee } from "./actions";
 
 export const dynamic = "force-dynamic";
 
 export default async function IdeenSeite() {
-  await stelleIdeenTabelleSicher();
 
   const { rows: ideen } = await pool.query<EssensIdee>(
     "SELECT * FROM essens_ideen ORDER BY erstellt_am, id"

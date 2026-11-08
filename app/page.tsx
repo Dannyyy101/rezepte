@@ -1,12 +1,12 @@
 import Link from "next/link";
 import RezeptKarte from "@/components/rezept-karte";
-import { pool, type Rezept } from "@/lib/db";
+import { pool, REZEPTE_MIT_BEWERTUNG, type RezeptMitBewertung } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  const { rows: neueste } = await pool.query<Rezept>(
-    "SELECT * FROM rezepte ORDER BY erstellt_am DESC LIMIT 6"
+  const { rows: neueste } = await pool.query<RezeptMitBewertung>(
+    `${REZEPTE_MIT_BEWERTUNG} ORDER BY r.erstellt_am DESC LIMIT 6`
   );
 
   return (

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import RezeptKarte from "@/components/rezept-karte";
-import { pool, type Rezept } from "@/lib/db";
+import { pool, REZEPTE_MIT_BEWERTUNG, type RezeptMitBewertung } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
@@ -19,8 +19,8 @@ export default async function KategorieSeite({
   if (!(kategorie in KATEGORIEN)) notFound();
   const info = KATEGORIEN[kategorie as keyof typeof KATEGORIEN];
 
-  const { rows: rezepte } = await pool.query<Rezept>(
-    "SELECT * FROM rezepte WHERE kategorie = $1 ORDER BY erstellt_am DESC",
+  const { rows: rezepte } = await pool.query<RezeptMitBewertung>(
+    `${REZEPTE_MIT_BEWERTUNG} WHERE r.kategorie = $1 ORDER BY r.erstellt_am DESC`,
     [kategorie]
   );
 

@@ -9,6 +9,12 @@ export type Rezept = {
   erstellt_am: Date;
 };
 
+/** Rezept mit dem Schnitt aller Bewertungen (null ohne Bewertung). */
+export type RezeptMitBewertung = Rezept & {
+  sterne_schnitt: number | null;
+  anzahl_bewertungen: number;
+};
+
 export type Mahlzeit = "mittag" | "abend";
 
 export type EssensIdee = {
@@ -23,34 +29,30 @@ const globalForDb = globalThis as unknown as { pool?: Pool };
 
 export const pool =
   globalForDb.pool ??
-  new Pool({
-    connectionString:
-      process.env.DATABASE_URL ??
-      "postgres://rezepte:rezepte@localhost:5432/rezepte",
-  });
+  new Pool(
+    // im Cluster kommen PGHOST, PGUSER, PGPASSWORD und PGDATABASE einzeln, die liest pg selbst
+    process.env.PGHOST && !process.env.DATABASE_URL
+      ? {}
+      : {
+          connectionString:
+            process.env.DATABASE_URL ?? "postgres://rezepte:rezepte@localhost:5434/rezepte",
+        }
+  );
 
 globalForDb.pool = pool;
 
-// init.sql läuft nur beim ersten Start eines frischen Volumes – für bestehende
-// Datenbanken legen wir die Ideen-Tabelle einmalig zur Laufzeit an.
-const globalForSchema = globalThis as unknown as { ideenSchema?: Promise<void> };
-
-export function stelleIdeenTabelleSicher(): Promise<void> {
-  globalForSchema.ideenSchema ??= pool
-    .query(`
-      CREATE TABLE IF NOT EXISTS essens_ideen (
-        id SERIAL PRIMARY KEY,
-        mahlzeit TEXT NOT NULL CHECK (mahlzeit IN ('mittag', 'abend')),
-        titel TEXT NOT NULL,
-        erstellt_am TIMESTAMPTZ NOT NULL DEFAULT now()
-      )
-    `)
-    .then(() => undefined)
-    .catch((fehler) => {
-      // Bei einem Fehler nicht dauerhaft cachen, sonst bleibt die Seite kaputt
-      globalForSchema.ideenSchema = undefined;
-      throw fehler;
-    });
-
-  return globalForSchema.ideenSchema;
-}
+/**
+ * SELECT für Rezepte samt Bewertungs-Schnitt, Bedingungen und Sortierung hängt der Aufrufer an.
+ * AVG liefert numeric, das pg als String zurückgibt, daher der Cast auf float.
+ */
+export const REZEPTE_MIT_BEWERTUNG = `
+  SELECT r.*,
+         b.sterne_schnitt::float AS sterne_schnitt,
+         COALESCE(b.anzahl, 0)::int AS anzahl_bewertungen
+  FROM rezepte r
+  LEFT JOIN (
+    SELECT rezept_id, AVG(sterne) AS sterne_schnitt, COUNT(*) AS anzahl
+    FROM bewertungen
+    GROUP BY rezept_id
+  ) b ON b.rezept_id = r.id
+`;

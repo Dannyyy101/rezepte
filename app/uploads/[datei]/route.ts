@@ -1,12 +1,10 @@
 import { readFile } from "fs/promises";
 import path from "path";
+import { UPLOADS_ORDNER } from "@/lib/bilder";
 
-// Der Produktions-Server liefert nur public/-Dateien aus, die beim Start
-// schon existierten. Neu hochgeladene Bilder landen deshalb hier: Dateien,
-// die nicht als statisches Asset gefunden werden, liest dieser Handler
-// direkt von der Platte.
-
-const UPLOADS_ORDNER = path.join(process.cwd(), "public", "uploads");
+// Der Produktions-Server liefert nur public/-Dateien aus, die beim Start schon existierten.
+// Neu hochgeladene Bilder landen deshalb hier: Dateien, die nicht als statisches Asset
+// gefunden werden, liest dieser Handler direkt von der Platte (im Cluster ein Volume).
 
 const CONTENT_TYPES: Record<string, string> = {
   ".jpg": "image/jpeg",
@@ -31,7 +29,9 @@ export async function GET(
     return new Response(new Uint8Array(daten), {
       headers: {
         "Content-Type": contentType,
-        "Cache-Control": "public, max-age=31536000, immutable",
+        // private: die Bilder gibt es nur angemeldet, Cloudflare soll sie nicht für alle cachen.
+        // Dateinamen sind UUIDs, ein Bild ändert sich nie.
+        "Cache-Control": "private, max-age=31536000, immutable",
       },
     });
   } catch {

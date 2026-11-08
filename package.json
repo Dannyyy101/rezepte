@@ -10,10 +10,13 @@
   },
   "dependencies": {
     "heic-convert": "^2.1.0",
+    "jose": "^6.2.15",
     "next": "16.2.9",
+    "openid-client": "^6.8.9",
     "pg": "^8.21.0",
     "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "react-dom": "19.2.4",
+    "sharp": "^0.35.5"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

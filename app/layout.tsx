@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import Link from "next/link";
+import { abmelden } from "./anmelden/actions";
+import { holeSession } from "@/lib/auth";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -13,11 +15,13 @@ export const metadata: Metadata = {
   description: "Rezepte zum Kochen und Backen",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const session = await holeSession();
+
   return (
     <html lang="de" className={`${geistSans.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col font-sans">
@@ -29,32 +33,43 @@ export default function RootLayout({
             >
               Mein Rezeptbuch
             </Link>
-            <nav className="flex items-center gap-1 sm:gap-2">
-              <Link
-                href="/kochen"
-                className="rounded-full px-3 py-2 font-medium text-stone-900 transition hover:bg-yellow-300 sm:px-4"
-              >
-                Kochen
-              </Link>
-              <Link
-                href="/backen"
-                className="rounded-full px-3 py-2 font-medium text-stone-900 transition hover:bg-yellow-300 sm:px-4"
-              >
-                Backen
-              </Link>
-              <Link
-                href="/ideen"
-                className="rounded-full px-3 py-2 font-medium text-stone-900 transition hover:bg-yellow-300 sm:px-4"
-              >
-                Ideen
-              </Link>
-              <Link
-                href="/neu"
-                className="ml-1 rounded-full bg-stone-900 px-4 py-2 font-semibold text-yellow-50 transition hover:bg-stone-700"
-              >
-                Neues Rezept
-              </Link>
-            </nav>
+            {session && (
+              <nav className="flex flex-wrap items-center gap-1 sm:gap-2">
+                <Link
+                  href="/kochen"
+                  className="rounded-full px-3 py-2 font-medium text-stone-900 transition hover:bg-yellow-300 sm:px-4"
+                >
+                  Kochen
+                </Link>
+                <Link
+                  href="/backen"
+                  className="rounded-full px-3 py-2 font-medium text-stone-900 transition hover:bg-yellow-300 sm:px-4"
+                >
+                  Backen
+                </Link>
+                <Link
+                  href="/ideen"
+                  className="rounded-full px-3 py-2 font-medium text-stone-900 transition hover:bg-yellow-300 sm:px-4"
+                >
+                  Ideen
+                </Link>
+                <Link
+                  href="/neu"
+                  className="ml-1 rounded-full bg-stone-900 px-4 py-2 font-semibold text-yellow-50 transition hover:bg-stone-700"
+                >
+                  Neues Rezept
+                </Link>
+                <form action={abmelden}>
+                  <button
+                    type="submit"
+                    title={`Abmelden (${session.benutzer.name || session.benutzer.email})`}
+                    className="cursor-pointer rounded-full px-3 py-2 text-sm font-medium text-stone-700 transition hover:bg-yellow-300"
+                  >
+                    Abmelden
+                  </button>
+                </form>
+              </nav>
+            )}
           </div>
         </header>
         <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8 sm:px-6 sm:py-12">

@@ -1,23 +1,9 @@
+# Nur für die lokale Entwicklung (npm run dev). In Produktion läuft die App im Cluster,
+# deployt über das infra-Repo (helm/rezepte, values/rezepte.yaml).
 services:
-  app:
-    build: .
-    container_name: rezepte-app
-    restart: unless-stopped
-    environment:
-      DATABASE_URL: postgres://rezepte:rezepte@db:5432/rezepte
-    ports:
-      - "3004:3000"
-    volumes:
-      # Gleicher Ordner wie bei "npm run dev", damit Uploads überall verfügbar sind
-      - ./public/uploads:/app/public/uploads
-    depends_on:
-      db:
-        condition: service_healthy
-
   db:
     image: postgres:17-alpine
-    container_name: rezepte-db
-    restart: unless-stopped
+    container_name: rezepte-db-dev
     environment:
       POSTGRES_USER: rezepte
       POSTGRES_PASSWORD: rezepte
@@ -26,9 +12,8 @@ services:
       - "5434:5432"
     volumes:
       - rezepte-daten:/var/lib/postgresql/data
-      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U rezepte -d rezepte" ]
+      test: ["CMD-SHELL", "pg_isready -U rezepte -d rezepte"]
       interval: 5s
       timeout: 3s
       retries: 10

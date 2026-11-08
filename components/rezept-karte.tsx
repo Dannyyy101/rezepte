@@ -1,5 +1,6 @@
 import Link from "next/link";
-import type { Rezept } from "@/lib/db";
+import type { RezeptMitBewertung } from "@/lib/db";
+import SterneAnzeige from "./sterne";
 
 const KATEGORIE_STIL = {
   kochen: {
@@ -14,7 +15,7 @@ const KATEGORIE_STIL = {
   },
 } as const;
 
-export default function RezeptKarte({ rezept }: { rezept: Rezept }) {
+export default function RezeptKarte({ rezept }: { rezept: RezeptMitBewertung }) {
   const stil = KATEGORIE_STIL[rezept.kategorie];
 
   return (
@@ -42,11 +43,18 @@ export default function RezeptKarte({ rezept }: { rezept: Rezept }) {
         <h3 className="font-semibold text-stone-900 group-hover:text-amber-800">
           {rezept.titel}
         </h3>
-        <span
-          className={`mt-2 inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${stil.badge}`}
-        >
-          {stil.label}
-        </span>
+        <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
+          <span
+            className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${stil.badge}`}
+          >
+            {stil.label}
+          </span>
+          <SterneAnzeige
+            schnitt={rezept.sterne_schnitt}
+            anzahl={rezept.anzahl_bewertungen}
+            klein
+          />
+        </div>
       </div>
     </Link>
   );
